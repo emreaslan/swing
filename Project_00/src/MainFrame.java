@@ -29,8 +29,9 @@ public class MainFrame extends JFrame {
                String name = e.getName();
                String occupation = e.getOccupation();
                int ageCategoryId = e.getAgeCategoryId();
+               String empCat = (String)e.getEmpCat();
 
-               textPanel.appendText(name + ": "+ occupation + ": " + ageCategoryId +"\n");
+               textPanel.appendText(name + ": "+ occupation + ": " + ageCategoryId + ": " + empCat +"\n");
            }
         });
 
@@ -38,7 +39,7 @@ public class MainFrame extends JFrame {
         add(toolbar, BorderLayout.NORTH);
         add(textPanel, BorderLayout.CENTER);
 
-        setSize(600, 500);
+        setSize(700, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
     }

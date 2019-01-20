@@ -1,7 +1,7 @@
 import java.util.EventObject;
 
 public class FormEvent extends EventObject {
-    private String name, occupation;
+    private String name, occupation, empCat;
     private int ageCategoryId;
 
     /**
@@ -14,11 +14,12 @@ public class FormEvent extends EventObject {
         super(source);
     }
 
-    public FormEvent(Object source, String name, String occupation, int ageCategoryId) {
+    public FormEvent(Object source, String name, String occupation, int ageCategoryId, String empCat) {
         super(source);
         this.name = name;
         this.occupation = occupation;
         this.setAgeCategoryId(ageCategoryId);
+        this.setEmpCat(empCat);
     }
 
     public String getName() {
@@ -43,6 +44,14 @@ public class FormEvent extends EventObject {
 
 	public void setAgeCategoryId(int ageCategoryId) {
 		this.ageCategoryId = ageCategoryId;
+	}
+
+	public String getEmpCat() {
+		return empCat;
+	}
+
+	public void setEmpCat(String empCat) {
+		this.empCat = empCat;
 	}
 
 }
