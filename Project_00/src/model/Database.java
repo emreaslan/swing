@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -56,10 +57,10 @@ public class Database {
 
 		String insertSql = "insert into people (id, name, age, employment_status, tax_id, us_citizen, gender, occupation) values (?, ?, ?, ?, ?, ?, ?, ?)";
 		PreparedStatement insertStmt = con.prepareStatement(insertSql);
-		
+
 		String updateSql = "update people set name=?, age=?, employment_status=?, tax_id=?, us_citizen=?, gender=?, occupation=? where id=?";
 		PreparedStatement updateStmt = con.prepareStatement(updateSql);
-		
+
 		for (Person person : people) {
 			int id = person.getId();
 			String name = person.getName();
@@ -79,7 +80,7 @@ public class Database {
 
 			if (count == 0) {
 				System.out.println("Inserting person with ID " + id);
-				
+
 				int col = 1;
 				insertStmt.setInt(col++, id);
 				insertStmt.setString(col++, name);
@@ -89,13 +90,13 @@ public class Database {
 				insertStmt.setBoolean(col++, isUs);
 				insertStmt.setString(col++, gender.name());
 				insertStmt.setString(col++, occupation);
-				
+
 				insertStmt.executeUpdate();
 			} else {
 				System.out.println("Updating person with ID " + id);
-				
+
 				int col = 1;
-				
+
 				updateStmt.setString(col++, name);
 				updateStmt.setString(col++, age.name());
 				updateStmt.setString(col++, emp.name());
@@ -104,7 +105,7 @@ public class Database {
 				updateStmt.setString(col++, gender.name());
 				updateStmt.setString(col++, occupation);
 				updateStmt.setInt(col++, id);
-				
+
 				updateStmt.executeUpdate();
 			}
 		}
@@ -112,6 +113,30 @@ public class Database {
 		updateStmt.close();
 		insertStmt.close();
 		checkStmt.close();
+	}
+
+	public void load() throws SQLException {
+		people.clear();
+		String sql = "select id, name, age, employment_status, tax_id, us_citizen, gender, occupation from people order by name";
+		Statement selectStmt = con.createStatement();
+
+		ResultSet results = selectStmt.executeQuery(sql);
+		while (results.next()) {
+			int id = results.getInt("id");
+			String name = results.getString("name");
+			String age = results.getString("age");
+			String emp = results.getString("employment_status");
+			String tax = results.getString("tax_id");
+			boolean isUs = results.getBoolean("us_citizen");
+			String gender = results.getString("gender");
+			String occ = results.getString("occupation");
+
+			Person person = new Person(id, name, occ, AgeCategory.valueOf(age), EmploymentCategory.valueOf(emp), tax,
+					isUs, Gender.valueOf(gender));
+			people.add(person);
+		}
+		results.close();
+		selectStmt.close();
 	}
 
 	public void addPerson(Person person) {
