@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -22,7 +23,7 @@ import javax.swing.KeyStroke;
 import controller.Controller;
 
 public class MainFrame extends JFrame {
-
+	private static final long serialVersionUID = -5124805826536096688L;
 	private TextPanel textPanel;
 	private Toolbar toolbar;
 	private FormPanel formPanel;
@@ -42,19 +43,19 @@ public class MainFrame extends JFrame {
 		formPanel = new FormPanel();
 		tablePanel = new TablePanel();
 		prefsDialog = new PrefsDialog(this);
-		
+
 		prefs = Preferences.userRoot().node("db");
 
 		controller = new Controller();
 
 		tablePanel.setData(controller.getPeople());
-		
+
 		tablePanel.setPersonTableListener(new PersonTableListener() {
 			public void rowDeleted(int row) {
 				controller.removePerson(row);
 			}
 		});
-		
+
 		prefsDialog.setPrefsListener(new PrefsListener() {
 			public void preferencesSet(String user, String password, int port) {
 				prefs.put("user", user);
@@ -62,11 +63,11 @@ public class MainFrame extends JFrame {
 				prefs.putInt("port", port);
 			}
 		});
-		
+
 		String user = prefs.get("user", "");
 		String password = prefs.get("password", "");
 		Integer port = prefs.getInt("port", 3306);
-		
+
 		prefsDialog.setDefaults(user, password, port);
 
 		fileChooser = new JFileChooser();
@@ -75,9 +76,26 @@ public class MainFrame extends JFrame {
 
 		setJMenuBar(createMenuBar());
 
-		toolbar.setStringListener(new StringListener() {
-			public void textEmitted(String text) {
-				textPanel.appendText(text);
+		toolbar.setToolbarListener(new ToolbarListener() {
+			public void saveEventOccured() {
+				connect();
+				try {
+					controller.save();
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(MainFrame.this, "Unable to save to database.",
+							"Database Connection Problem", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			public void refreshEventOccured() {
+				connect();
+				try {
+					controller.load();
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(MainFrame.this, "Unable to load from database.",
+							"Database Connection Problem", JOptionPane.ERROR_MESSAGE);
+				}
+				tablePanel.refresh();
 			}
 		});
 
@@ -91,12 +109,20 @@ public class MainFrame extends JFrame {
 		add(formPanel, BorderLayout.WEST);
 		add(toolbar, BorderLayout.NORTH);
 		add(tablePanel, BorderLayout.CENTER);
-		
-		
+
 		setMinimumSize(new Dimension(500, 400));
 		setSize(600, 500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
+	}
+
+	private void connect() {
+		try {
+			controller.connect();
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(MainFrame.this, "Cannot connect to database.", "Database Connection Problem",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private JMenuBar createMenuBar() {
@@ -125,7 +151,7 @@ public class MainFrame extends JFrame {
 
 		menuBar.add(fileMenu);
 		menuBar.add(windowMenu);
-		
+
 		prefsItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				prefsDialog.setVisible(true);
@@ -142,15 +168,12 @@ public class MainFrame extends JFrame {
 
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 		exitItem.setMnemonic(KeyEvent.VK_X);
-		
-		prefsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
-				ActionEvent.CTRL_MASK));
 
-		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-				ActionEvent.CTRL_MASK));
-		
-		importDataItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
-				ActionEvent.CTRL_MASK));
+		prefsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+
+		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
+
+		importDataItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
 
 		importDataItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -159,8 +182,7 @@ public class MainFrame extends JFrame {
 						controller.loadFromFile(fileChooser.getSelectedFile());
 						tablePanel.refresh();
 					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(MainFrame.this,
-								"Could not load data from file.", "Error",
+						JOptionPane.showMessageDialog(MainFrame.this, "Could not load data from file.", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					}
 				}
@@ -173,8 +195,7 @@ public class MainFrame extends JFrame {
 					try {
 						controller.saveToFile(fileChooser.getSelectedFile());
 					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(MainFrame.this,
-								"Could not save data to file.", "Error",
+						JOptionPane.showMessageDialog(MainFrame.this, "Could not save data to file.", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					}
 				}
@@ -185,8 +206,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 
 				int action = JOptionPane.showConfirmDialog(MainFrame.this,
-						"Do you really want to exit the application?",
-						"Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
+						"Do you really want to exit the application?", "Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
 
 				if (action == JOptionPane.OK_OPTION) {
 					System.exit(0);
