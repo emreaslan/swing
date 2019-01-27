@@ -54,19 +54,46 @@ public class Database {
 		String checkSql = "select count(*) as count from people where id=?";
 		PreparedStatement checkStmt = con.prepareStatement(checkSql);
 
+		String insertSql = "insert into people (id, name, age, employment_status, tax_id, us_citizen, gender, occupation) values (?, ?, ?, ?, ?, ?, ?, ?)";
+		PreparedStatement insertStmt = con.prepareStatement(insertSql);
+		
 		for (Person person : people) {
 			int id = person.getId();
+			String name = person.getName();
+			String occupation = person.getOccupation();
+			AgeCategory age = person.getAgeCategory();
+			EmploymentCategory emp = person.getEmpCat();
+			String tax = person.getTaxId();
+			boolean isUs = person.isUsCitizen();
+			Gender gender = person.getGender();
 
 			checkStmt.setInt(1, id);
-			
+
 			ResultSet checkResult = checkStmt.executeQuery();
 			checkResult.next();
-			
+
 			int count = checkResult.getInt(1);
-			
-			System.out.println("Count for person with ID " + id + " is " + count);
+
+			if (count == 0) {
+				System.out.println("Inserting person with ID " + id);
+				
+				int col = 1;
+				insertStmt.setInt(col++, id);
+				insertStmt.setString(col++, name);
+				insertStmt.setString(col++, age.name());
+				insertStmt.setString(col++, emp.name());
+				insertStmt.setString(col++, tax);
+				insertStmt.setBoolean(col++, isUs);
+				insertStmt.setString(col++, gender.name());
+				insertStmt.setString(col++, occupation);
+				
+				insertStmt.executeUpdate();
+			} else {
+				System.out.println("Updating person with ID " + id);
+			}
 		}
 
+		insertStmt.close();
 		checkStmt.close();
 	}
 
