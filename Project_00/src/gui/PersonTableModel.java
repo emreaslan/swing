@@ -29,17 +29,14 @@ public class PersonTableModel extends AbstractTableModel {
 		this.db = db;
 	}
 
-	@Override
 	public int getColumnCount() {
 		return 7;
 	}
 
-	@Override
 	public int getRowCount() {
 		return db.size();
 	}
 
-	@Override
 	public Object getValueAt(int row, int col) {
 		Person person = db.get(row);
 		
