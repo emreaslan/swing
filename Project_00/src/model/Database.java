@@ -37,8 +37,6 @@ public class Database {
 
 		String url = "jdbc:mysql://localhost:3306/SwingTestSchema";
 		con = DriverManager.getConnection(url, "root", "password");
-
-		System.out.println("Connected: " + con);
 	}
 
 	public void disconnect() {
@@ -79,7 +77,6 @@ public class Database {
 			int count = checkResult.getInt(1);
 
 			if (count == 0) {
-				System.out.println("Inserting person with ID " + id);
 
 				int col = 1;
 				insertStmt.setInt(col++, id);
@@ -93,7 +90,6 @@ public class Database {
 
 				insertStmt.executeUpdate();
 			} else {
-				System.out.println("Updating person with ID " + id);
 
 				int col = 1;
 

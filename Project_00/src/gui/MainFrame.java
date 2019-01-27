@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.prefs.Preferences;
@@ -106,13 +107,23 @@ public class MainFrame extends JFrame {
 			}
 		});
 
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				controller.disconnect();
+				dispose();
+				System.gc();
+			}
+			
+		});
+		
 		add(formPanel, BorderLayout.WEST);
 		add(toolbar, BorderLayout.NORTH);
 		add(tablePanel, BorderLayout.CENTER);
 
 		setMinimumSize(new Dimension(500, 400));
 		setSize(600, 500);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setVisible(true);
 	}
 
@@ -209,7 +220,11 @@ public class MainFrame extends JFrame {
 						"Do you really want to exit the application?", "Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
 
 				if (action == JOptionPane.OK_OPTION) {
-					System.exit(0);
+					WindowListener[] listeners = getWindowListeners();
+					
+					for(WindowListener listener : listeners){
+						listener.windowClosing(new WindowEvent(MainFrame.this, 0));
+					}
 				}
 			}
 		});
