@@ -8,29 +8,32 @@ import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
-public class Toolbar extends JPanel implements ActionListener {
+public class Toolbar extends JToolBar implements ActionListener {
 	private JButton saveButton;
 	private JButton refreshButton;
 
 	private ToolbarListener textListener;
 
 	public Toolbar() {
+		// Get rid of the border if you want the toolbar draggable.
 		setBorder(BorderFactory.createEtchedBorder());
+		// setFloatable(false);
 
-		saveButton = new JButton("Save");
+		saveButton = new JButton();
 		saveButton.setIcon(createIcon("../images/Save16.gif"));
-		
-		refreshButton = new JButton("Refresh");
+		saveButton.setToolTipText("Save");
+
+		refreshButton = new JButton();
 		refreshButton.setIcon(createIcon("../images/Refresh16.gif"));
+		refreshButton.setToolTipText("Refresh");
 
 		saveButton.addActionListener(this);
 		refreshButton.addActionListener(this);
 
-		setLayout(new FlowLayout(FlowLayout.LEFT));
-
 		add(saveButton);
+		// addSeparator();
 		add(refreshButton);
 	}
 
