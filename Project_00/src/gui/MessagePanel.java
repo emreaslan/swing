@@ -10,6 +10,24 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
+class ServerInfo {
+	private String name;
+	private int id;
+	
+	public ServerInfo(String name, int id) {
+		this.id = id;
+		this.name = name;
+	}
+	
+	public int getId(){
+		return id;
+	}
+	
+	public String toString(){
+		return name;
+	}
+}
+
 public class MessagePanel extends JPanel {
 
 	private JTree serverTree;
@@ -22,7 +40,7 @@ public class MessagePanel extends JPanel {
 			
 			public void valueChanged(TreeSelectionEvent e) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) serverTree.getLastSelectedPathComponent();
-				Object userObject = node.getUserObject();
+				Object userObject = node.getUserObject();				
 				System.out.println(userObject);
 			}
 		});
@@ -37,9 +55,9 @@ public class MessagePanel extends JPanel {
 
 		DefaultMutableTreeNode branch1 = new DefaultMutableTreeNode("USA");
 
-		DefaultMutableTreeNode server1 = new DefaultMutableTreeNode("New York");
-		DefaultMutableTreeNode server2 = new DefaultMutableTreeNode("Boston");
-		DefaultMutableTreeNode server3 = new DefaultMutableTreeNode("Los Angeles");
+		DefaultMutableTreeNode server1 = new DefaultMutableTreeNode(new ServerInfo("New York", 1));
+		DefaultMutableTreeNode server2 = new DefaultMutableTreeNode(new ServerInfo("Boston", 2));
+		DefaultMutableTreeNode server3 = new DefaultMutableTreeNode(new ServerInfo("Los Angeles", 3));
 
 		branch1.add(server1);
 		branch1.add(server2);
@@ -47,8 +65,8 @@ public class MessagePanel extends JPanel {
 
 		DefaultMutableTreeNode branch2 = new DefaultMutableTreeNode("UK");
 
-		DefaultMutableTreeNode server4 = new DefaultMutableTreeNode("London");
-		DefaultMutableTreeNode server5 = new DefaultMutableTreeNode("Edinburgh");
+		DefaultMutableTreeNode server4 = new DefaultMutableTreeNode(new ServerInfo("London", 4));
+		DefaultMutableTreeNode server5 = new DefaultMutableTreeNode(new ServerInfo("Edinburgh", 5));
 
 		branch2.add(server4);
 		branch2.add(server5);
