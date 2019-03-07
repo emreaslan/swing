@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -12,6 +14,9 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
+
+import controller.MessageServer;
+import model.Message;
 
 class ServerInfo {
 	private String name;
@@ -46,8 +51,16 @@ public class MessagePanel extends JPanel {
 	private JTree serverTree;
 	private ServerTreeCellRenderer treeCellRenderer;
 	private ServerTreeCellEditor treeCellEditor;
+	private Set<Integer> selectedServers;
+	private MessageServer messageServer;
 	
 	public MessagePanel() {
+		messageServer = new MessageServer();
+		selectedServers = new TreeSet<Integer>();
+		selectedServers.add(1);
+		selectedServers.add(2);
+		selectedServers.add(4);
+		
 		treeCellRenderer = new ServerTreeCellRenderer();
 		treeCellEditor = new ServerTreeCellEditor();
 
@@ -62,6 +75,20 @@ public class MessagePanel extends JPanel {
 			public void editingStopped(ChangeEvent e) {
 				ServerInfo info = (ServerInfo)treeCellEditor.getCellEditorValue();
 				System.out.println(info + ": " + info.getId() + "; " + info.isChecked() );
+				
+				int serverId = info.getId();
+				if (info.isChecked()){
+					selectedServers.add(serverId);
+				} else {
+					selectedServers.remove(serverId);
+				}
+				messageServer.setSelectedServers(selectedServers);
+				
+				System.out.println("Messages are waiting: "+ messageServer.getMessagesCount());
+				
+				for (Message message : messageServer){
+					System.out.println(message.getTitle());
+				}
 			}
 			
 			public void editingCanceled(ChangeEvent e) {
@@ -78,9 +105,9 @@ public class MessagePanel extends JPanel {
 
 		DefaultMutableTreeNode branch1 = new DefaultMutableTreeNode("USA");
 
-		DefaultMutableTreeNode server1 = new DefaultMutableTreeNode(new ServerInfo("New York", 1, false));
-		DefaultMutableTreeNode server2 = new DefaultMutableTreeNode(new ServerInfo("Boston", 2, false));
-		DefaultMutableTreeNode server3 = new DefaultMutableTreeNode(new ServerInfo("Los Angeles", 3, false));
+		DefaultMutableTreeNode server1 = new DefaultMutableTreeNode(new ServerInfo("New York", 1, selectedServers.contains(1)));
+		DefaultMutableTreeNode server2 = new DefaultMutableTreeNode(new ServerInfo("Boston", 2, selectedServers.contains(2)));
+		DefaultMutableTreeNode server3 = new DefaultMutableTreeNode(new ServerInfo("Los Angeles", 3, selectedServers.contains(3)));
 
 		branch1.add(server1);
 		branch1.add(server2);
@@ -88,8 +115,8 @@ public class MessagePanel extends JPanel {
 
 		DefaultMutableTreeNode branch2 = new DefaultMutableTreeNode("UK");
 
-		DefaultMutableTreeNode server4 = new DefaultMutableTreeNode(new ServerInfo("London", 4, false));
-		DefaultMutableTreeNode server5 = new DefaultMutableTreeNode(new ServerInfo("Edinburgh", 5, false));
+		DefaultMutableTreeNode server4 = new DefaultMutableTreeNode(new ServerInfo("London", 4, selectedServers.contains(4)));
+		DefaultMutableTreeNode server5 = new DefaultMutableTreeNode(new ServerInfo("Edinburgh", 5, selectedServers.contains(5)));
 
 		branch2.add(server4);
 		branch2.add(server5);
