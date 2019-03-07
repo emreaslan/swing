@@ -146,7 +146,7 @@ public class MainFrame extends JFrame {
 		add(splitPane, BorderLayout.CENTER);
 
 		setMinimumSize(new Dimension(500, 400));
-		setSize(600, 500);
+		setSize(1000, 650);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setVisible(true);
 	}
