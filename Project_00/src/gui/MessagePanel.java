@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -10,13 +11,11 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
 
 import controller.MessageServer;
@@ -57,6 +56,7 @@ public class MessagePanel extends JPanel {
 	private ServerTreeCellEditor treeCellEditor;
 	private Set<Integer> selectedServers;
 	private MessageServer messageServer;
+	private ProgressDialog progressDialog;
 	
 	public MessagePanel() {
 		messageServer = new MessageServer();
@@ -67,7 +67,7 @@ public class MessagePanel extends JPanel {
 		
 		treeCellRenderer = new ServerTreeCellRenderer();
 		treeCellEditor = new ServerTreeCellEditor();
-
+		progressDialog = new ProgressDialog((Window)getParent());
 		
 		serverTree = new JTree(createTree());		
 		serverTree.setCellRenderer(treeCellRenderer);
@@ -92,6 +92,14 @@ public class MessagePanel extends JPanel {
 			
 			private void retrieveMessages() {
 				System.out.println("Messages are waiting: "+ messageServer.getMessagesCount());
+				
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						System.out.println("Showing modal dialog..");
+						progressDialog.setVisible(true);
+						System.out.println("Finished showing modal dialog..");
+					}
+				});				
 				
 				SwingWorker<List<Message>, Integer> worker = new SwingWorker<List<Message>, Integer>(){
 
@@ -120,6 +128,7 @@ public class MessagePanel extends JPanel {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						progressDialog.setVisible(false);
 					}
 					
 					@Override
