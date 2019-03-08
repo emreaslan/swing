@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -25,26 +26,26 @@ class ServerInfo {
 	private String name;
 	private int id;
 	private boolean checked;
-	
+
 	public ServerInfo(String name, int id, boolean checked) {
 		this.id = id;
 		this.name = name;
 		this.checked = checked;
 	}
-	
-	public int getId(){
+
+	public int getId() {
 		return id;
 	}
-	
-	public String toString(){
+
+	public String toString() {
 		return name;
 	}
-	
-	public boolean isChecked(){
+
+	public boolean isChecked() {
 		return checked;
 	}
-	
-	public void setChecked(boolean checked){
+
+	public void setChecked(boolean checked) {
 		this.checked = checked;
 	}
 }
@@ -57,57 +58,50 @@ public class MessagePanel extends JPanel {
 	private Set<Integer> selectedServers;
 	private MessageServer messageServer;
 	private ProgressDialog progressDialog;
-	
-	public MessagePanel() {
+
+	public MessagePanel(JFrame parent) {
 		messageServer = new MessageServer();
 		selectedServers = new TreeSet<Integer>();
 		selectedServers.add(1);
 		selectedServers.add(2);
 		selectedServers.add(4);
-		
+
 		treeCellRenderer = new ServerTreeCellRenderer();
 		treeCellEditor = new ServerTreeCellEditor();
-		progressDialog = new ProgressDialog((Window)getParent());
-		
-		serverTree = new JTree(createTree());		
+		progressDialog = new ProgressDialog(parent);
+
+		serverTree = new JTree(createTree());
 		serverTree.setCellRenderer(treeCellRenderer);
 		serverTree.setCellEditor(treeCellEditor);
 		serverTree.setEditable(true);
-		
+
 		serverTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		treeCellEditor.addCellEditorListener(new CellEditorListener() {
 			public void editingStopped(ChangeEvent e) {
-				ServerInfo info = (ServerInfo)treeCellEditor.getCellEditorValue();
-				System.out.println(info + ": " + info.getId() + "; " + info.isChecked() );
-				
+				ServerInfo info = (ServerInfo) treeCellEditor.getCellEditorValue();
+				System.out.println(info + ": " + info.getId() + "; " + info.isChecked());
+
 				int serverId = info.getId();
-				if (info.isChecked()){
+				if (info.isChecked()) {
 					selectedServers.add(serverId);
 				} else {
 					selectedServers.remove(serverId);
 				}
 				messageServer.setSelectedServers(selectedServers);
-				retrieveMessages();				
+				retrieveMessages();
 			}
-			
+
 			private void retrieveMessages() {
-				System.out.println("Messages are waiting: "+ messageServer.getMessagesCount());
-				
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						System.out.println("Showing modal dialog..");
-						progressDialog.setVisible(true);
-						System.out.println("Finished showing modal dialog..");
-					}
-				});				
-				
-				SwingWorker<List<Message>, Integer> worker = new SwingWorker<List<Message>, Integer>(){
+				progressDialog.setMaximum(messageServer.getMessagesCount());
+				progressDialog.setVisible(true);
+
+				SwingWorker<List<Message>, Integer> worker = new SwingWorker<List<Message>, Integer>() {
 
 					@Override
 					protected List<Message> doInBackground() throws Exception {
 						List<Message> retrievedMessages = new ArrayList<Message>();
 						int count = 0;
-						for (Message message : messageServer){
+						for (Message message : messageServer) {
 							System.out.println(message.getTitle());
 							retrievedMessages.add(message);
 							++count;
@@ -115,12 +109,11 @@ public class MessagePanel extends JPanel {
 						}
 						return retrievedMessages;
 					}
-					
+
 					@Override
 					protected void done() {
 						try {
 							List<Message> retrivedMesages = get();
-							System.out.println("Retrieved " + retrivedMesages.size() + " messages.");
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -130,19 +123,19 @@ public class MessagePanel extends JPanel {
 						}
 						progressDialog.setVisible(false);
 					}
-					
+
 					@Override
-					protected void process(List<Integer> counts) {					
+					protected void process(List<Integer> counts) {
 						int retrieved = counts.get(counts.size() - 1);
-						System.out.println("Got retrieved " + retrieved + " messages.");
+						progressDialog.setValue(retrieved);
 					}
 				};
-				
+
 				worker.execute();
 			}
 
 			public void editingCanceled(ChangeEvent e) {
-				
+
 			}
 		});
 		setLayout(new BorderLayout());
@@ -155,9 +148,12 @@ public class MessagePanel extends JPanel {
 
 		DefaultMutableTreeNode branch1 = new DefaultMutableTreeNode("USA");
 
-		DefaultMutableTreeNode server1 = new DefaultMutableTreeNode(new ServerInfo("New York", 1, selectedServers.contains(1)));
-		DefaultMutableTreeNode server2 = new DefaultMutableTreeNode(new ServerInfo("Boston", 2, selectedServers.contains(2)));
-		DefaultMutableTreeNode server3 = new DefaultMutableTreeNode(new ServerInfo("Los Angeles", 3, selectedServers.contains(3)));
+		DefaultMutableTreeNode server1 = new DefaultMutableTreeNode(
+				new ServerInfo("New York", 1, selectedServers.contains(1)));
+		DefaultMutableTreeNode server2 = new DefaultMutableTreeNode(
+				new ServerInfo("Boston", 2, selectedServers.contains(2)));
+		DefaultMutableTreeNode server3 = new DefaultMutableTreeNode(
+				new ServerInfo("Los Angeles", 3, selectedServers.contains(3)));
 
 		branch1.add(server1);
 		branch1.add(server2);
@@ -165,8 +161,10 @@ public class MessagePanel extends JPanel {
 
 		DefaultMutableTreeNode branch2 = new DefaultMutableTreeNode("UK");
 
-		DefaultMutableTreeNode server4 = new DefaultMutableTreeNode(new ServerInfo("London", 4, selectedServers.contains(4)));
-		DefaultMutableTreeNode server5 = new DefaultMutableTreeNode(new ServerInfo("Edinburgh", 5, selectedServers.contains(5)));
+		DefaultMutableTreeNode server4 = new DefaultMutableTreeNode(
+				new ServerInfo("London", 4, selectedServers.contains(4)));
+		DefaultMutableTreeNode server5 = new DefaultMutableTreeNode(
+				new ServerInfo("Edinburgh", 5, selectedServers.contains(5)));
 
 		branch2.add(server4);
 		branch2.add(server5);
