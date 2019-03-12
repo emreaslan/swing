@@ -65,15 +65,15 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 	private SwingWorker<List<Message>, Integer> worker;
 
 	private TextPanel textPanel;
-	private JList<String> messageList;
+	private JList<Message> messageList;
 	private JSplitPane upperPane;
 	private JSplitPane lowerPane;
 
-	private DefaultListModel<String> messageListModel;
+	private DefaultListModel<Message> messageListModel;
 
 	public MessagePanel(JFrame parent) {
 
-		messageListModel = new DefaultListModel<String>();
+		messageListModel = new DefaultListModel<Message>();
 
 		messageServer = new MessageServer();
 		selectedServers = new TreeSet<Integer>();
@@ -116,7 +116,8 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 		setLayout(new BorderLayout());
 
 		textPanel = new TextPanel();
-		messageList = new JList<String>(messageListModel);
+		messageList = new JList<Message>(messageListModel);
+		messageList.setCellRenderer(new MessageListRenderer());
 
 		lowerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(messageList), textPanel);
 		upperPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(serverTree), lowerPane);
@@ -166,7 +167,7 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 					messageListModel.removeAllElements();
 
 					for (Message message : retrivedMesages) {
-						messageListModel.addElement(message.getTitle());
+						messageListModel.addElement(message);
 					}
 
 				} catch (InterruptedException e) {
