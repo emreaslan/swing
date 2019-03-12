@@ -50,7 +50,7 @@ class ServerInfo {
 	}
 }
 
-public class MessagePanel extends JPanel {
+public class MessagePanel extends JPanel implements ProgressDialogListener {
 
 	private JTree serverTree;
 	private ServerTreeCellRenderer treeCellRenderer;
@@ -58,6 +58,7 @@ public class MessagePanel extends JPanel {
 	private Set<Integer> selectedServers;
 	private MessageServer messageServer;
 	private ProgressDialog progressDialog;
+	private SwingWorker<List<Message>, Integer> worker;
 
 	public MessagePanel(JFrame parent) {
 		messageServer = new MessageServer();
@@ -68,7 +69,8 @@ public class MessagePanel extends JPanel {
 
 		treeCellRenderer = new ServerTreeCellRenderer();
 		treeCellEditor = new ServerTreeCellEditor();
-		progressDialog = new ProgressDialog(parent);
+		progressDialog = new ProgressDialog(parent, "Messages downloading...");
+		progressDialog.setListener(this);
 
 		serverTree = new JTree(createTree());
 		serverTree.setCellRenderer(treeCellRenderer);
@@ -95,13 +97,15 @@ public class MessagePanel extends JPanel {
 				progressDialog.setMaximum(messageServer.getMessagesCount());
 				progressDialog.setVisible(true);
 
-				SwingWorker<List<Message>, Integer> worker = new SwingWorker<List<Message>, Integer>() {
+				worker = new SwingWorker<List<Message>, Integer>() {
 
 					@Override
 					protected List<Message> doInBackground() throws Exception {
 						List<Message> retrievedMessages = new ArrayList<Message>();
 						int count = 0;
 						for (Message message : messageServer) {
+							if (isCancelled())
+								break;
 							System.out.println(message.getTitle());
 							retrievedMessages.add(message);
 							++count;
@@ -112,6 +116,10 @@ public class MessagePanel extends JPanel {
 
 					@Override
 					protected void done() {
+						progressDialog.setVisible(false);
+
+						if (isCancelled())
+							return;
 						try {
 							List<Message> retrivedMesages = get();
 						} catch (InterruptedException e) {
@@ -173,5 +181,11 @@ public class MessagePanel extends JPanel {
 		top.add(branch2);
 
 		return top;
+	}
+
+	public void progressDialogCancelled() {
+		if (worker != null) {
+			worker.cancel(true);
+		}
 	}
 }
