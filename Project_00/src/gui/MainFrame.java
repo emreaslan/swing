@@ -24,6 +24,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import controller.Controller;
 
@@ -80,6 +82,15 @@ public class MainFrame extends JFrame {
 			}
 		});
 
+		tabPane.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				int tabIndex = tabPane.getSelectedIndex();
+				if (tabIndex == 1){
+					messagePanel.refresh();
+				}
+			}
+		});
+		
 		prefsDialog.setPrefsListener(new PrefsListener() {
 			public void preferencesSet(String user, String password, int port) {
 				prefs.put("user", user);
