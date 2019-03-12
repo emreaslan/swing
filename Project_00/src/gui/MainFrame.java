@@ -29,7 +29,6 @@ import controller.Controller;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = -5124805826536096688L;
-	private TextPanel textPanel;
 	private Toolbar toolbar;
 	private FormPanel formPanel;
 	private JFileChooser fileChooser;
@@ -57,7 +56,6 @@ public class MainFrame extends JFrame {
 		setLayout(new BorderLayout());
 
 		toolbar = new Toolbar();
-		textPanel = new TextPanel();
 		formPanel = new FormPanel();
 		tablePanel = new TablePanel();
 		prefsDialog = new PrefsDialog(this);
