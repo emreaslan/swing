@@ -24,6 +24,10 @@ public class Controller {
 		db.removePerson(index);
 	}
 	
+	public void configure(int port, String user, String password) throws Exception{
+		db.configure(port, user, password);
+	}
+	
 	public void connect() throws Exception{
 		db.connect();
 	}
