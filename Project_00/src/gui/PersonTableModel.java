@@ -21,6 +21,7 @@ public class PersonTableModel extends AbstractTableModel {
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 1:
+		case 4:
 		case 5:
 			return true;
 		default:
@@ -39,6 +40,9 @@ public class PersonTableModel extends AbstractTableModel {
 		switch (columnIndex) {
 		case 1:
 			person.setName((String) aValue);
+			break;
+		case 4:
+			person.setEmpCat((EmploymentCategory)aValue);
 			break;
 		case 5:
 			person.setUsCitizen((Boolean) aValue);
