@@ -7,23 +7,47 @@ import javax.swing.table.AbstractTableModel;
 import model.Person;
 
 public class PersonTableModel extends AbstractTableModel {
-	
+
 	private List<Person> db;
-	
-	private String[] colNames = {"ID", "Name", "Occupation", "Age Category", "Employment Category", "US Citizen", "Tax ID"};
-	
+
+	private String[] colNames = { "ID", "Name", "Occupation", "Age Category", "Employment Category", "US Citizen",
+			"Tax ID" };
+
 	public PersonTableModel() {
 	}
-	
-	
-	
+
 	@Override
-	public String getColumnName(int column) {
-		// TODO Auto-generated method stub
-		return colNames[column];
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		switch (columnIndex) {
+		case 1:
+			return true;
+		default:
+			return false;
+		}
 	}
 
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 
+		if (db == null)
+			return;
+		
+		Person person = db.get(rowIndex);
+		
+		switch (columnIndex) {
+		case 1:
+			person.setName((String) aValue);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	@Override
+	public String getColumnName(int column) {
+		return colNames[column];
+	}
 
 	public void setData(List<Person> db) {
 		this.db = db;
@@ -39,8 +63,8 @@ public class PersonTableModel extends AbstractTableModel {
 
 	public Object getValueAt(int row, int col) {
 		Person person = db.get(row);
-		
-		switch(col) {
+
+		switch (col) {
 		case 0:
 			return person.getId();
 		case 1:
@@ -56,7 +80,7 @@ public class PersonTableModel extends AbstractTableModel {
 		case 6:
 			return person.getTaxId();
 		}
-		
+
 		return null;
 	}
 
