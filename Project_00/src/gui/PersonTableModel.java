@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import model.EmploymentCategory;
 import model.Person;
 
 public class PersonTableModel extends AbstractTableModel {
@@ -58,7 +59,7 @@ public class PersonTableModel extends AbstractTableModel {
 		case 3:
 			return String.class;
 		case 4:
-			return String.class;
+			return EmploymentCategory.class;
 		case 5:
 			return Boolean.class;
 		case 6:
