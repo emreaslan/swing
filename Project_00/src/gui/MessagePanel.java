@@ -156,7 +156,6 @@ public class MessagePanel extends JPanel implements ProgressDialogListener {
 				for (Message message : messageServer) {
 					if (isCancelled())
 						break;
-					System.out.println(message.getTitle());
 					retrievedMessages.add(message);
 					++count;
 					publish(count);
